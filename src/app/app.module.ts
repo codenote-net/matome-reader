@@ -11,6 +11,18 @@ import { SafariViewController } from '@ionic-native/safari-view-controller';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 
+import { AngularFireModule } from 'angularfire2';
+import { AngularFirestoreModule, AngularFirestore } from 'angularfire2/firestore';
+
+export const firebaseConfig = {
+  apiKey: 'AIzaSyDCCfDEeAXiAwtrFPxlFWfXBE1byIppu7I',
+  authDomain: 'matome-reader.firebaseapp.com',
+  databaseURL: 'https://matome-reader.firebaseio.com',
+  projectId: 'matome-reader',
+  storageBucket: 'matome-reader.appspot.com',
+  messagingSenderId: '521547239996'
+};
+
 @NgModule({
   declarations: [
     MyApp,
@@ -20,6 +32,8 @@ import { SplashScreen } from '@ionic-native/splash-screen';
   imports: [
     BrowserModule,
     IonicModule.forRoot(MyApp),
+    AngularFireModule.initializeApp(firebaseConfig),
+    AngularFirestoreModule
   ],
   bootstrap: [IonicApp],
   entryComponents: [
@@ -28,6 +42,7 @@ import { SplashScreen } from '@ionic-native/splash-screen';
     ListPage
   ],
   providers: [
+    AngularFirestore,
     InAppBrowser,
     SafariViewController,
     StatusBar,
