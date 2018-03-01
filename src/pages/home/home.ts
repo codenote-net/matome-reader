@@ -2,15 +2,20 @@ import { Component } from '@angular/core';
 import { NavController, Platform } from 'ionic-angular';
 import { InAppBrowser } from '@ionic-native/in-app-browser';
 import { SafariViewController } from '@ionic-native/safari-view-controller';
+import { AngularFirestore } from 'angularfire2/firestore';
+import { Observable } from 'rxjs/Observable';
 
 @Component({
   selector: 'page-home',
   templateUrl: 'home.html'
 })
 export class HomePage {
+  articles: Observable<any[]>;
 
   constructor(public navCtrl: NavController, public platform: Platform,
-    private iab: InAppBrowser, private safariViewController: SafariViewController) {
+    private iab: InAppBrowser, private safariViewController: SafariViewController,
+    db: AngularFirestore) {
+    this.articles = db.collection('latestArticles').valueChanges();
   }
 
   openUrl(url: string) {

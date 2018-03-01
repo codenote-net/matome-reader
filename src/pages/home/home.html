@@ -8,16 +8,15 @@
 </ion-header>
 
 <ion-content>
-  <ion-card (click)="openUrl('https://ionic.io');">
+  <ion-card *ngFor="let article of articles | async" (click)="openUrl(article.url);">
+    <img src={{article.imgUrl}}/>
     <ion-card-content>
       <ion-card-title>
-        Title 1
+        {{article.title}}
         </ion-card-title>
       <p>
-        The most popular industrial group ever, and largely
-        responsible for bringing the music to a mass audience.
+        {{article.publishedDate | date: 'medium'}}
       </p>
     </ion-card-content>
   </ion-card>
-
 </ion-content>
