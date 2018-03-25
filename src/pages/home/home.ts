@@ -58,6 +58,18 @@ export class HomePage {
     });
   }
 
+  doInfinite(infiniteScroll) {
+    const cursor = this.getCursor();
+
+    // Fetch articles if cursor was updated
+    if (this.currentCursor !== cursor) {
+      this.currentCursor = cursor;
+      this.fetchArticles(cursor);
+    }
+
+    infiniteScroll.complete();
+  }
+
   private fetchArticles(cursor?) {
     this.db.collection('latestArticles', ref => {
       let query: Query = ref;
