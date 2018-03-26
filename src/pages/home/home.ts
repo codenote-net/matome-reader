@@ -21,7 +21,10 @@ export class HomePage {
   }
 
   ionViewWillEnter() {
-    this.fetchArticles();
+    this.fetchArticles()
+      .subscribe(articles => {
+        this.articles.next(articles);
+      });
   }
 
   openUrl(url: string) {
@@ -57,20 +60,36 @@ export class HomePage {
     });
   }
 
+  doRefresh(refresher) {
+    this.fetchArticles()
+      .subscribe(articles => {
+        this.articles.next(articles);
+        this.currentCursor = null;
+
+        refresher.complete();
+      });
+  }
+
   doInfinite(infiniteScroll) {
     const cursor = this.getCursor();
 
     // Fetch articles if cursor was updated
     if (this.currentCursor !== cursor) {
-      this.currentCursor = cursor;
-      this.fetchArticles(cursor);
-    }
+      this.fetchArticles(cursor)
+        .subscribe(articles => {
+          const current = this.articles.getValue();
+          this.articles.next(_.concat(current, articles));
+          this.currentCursor = cursor;
 
-    infiniteScroll.complete();
+          infiniteScroll.complete();
+        });
+    } else {
+      infiniteScroll.complete();
+    }
   }
 
   private fetchArticles(cursor?) {
-    this.db.collection('latestArticles', ref => {
+    return this.db.collection('latestArticles', ref => {
       let query: Query = ref;
 
       query = query
@@ -83,11 +102,7 @@ export class HomePage {
 
       return query;
     })
-    .valueChanges()
-    .subscribe(articles => {
-      const current = this.articles.getValue();
-      this.articles.next(_.concat(current, articles));
-    });
+    .valueChanges();
   }
 
   // Determines the specified field's value of the last doc to paginate query
