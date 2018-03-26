@@ -8,6 +8,13 @@
 </ion-header>
 
 <ion-content>
+  <ion-refresher (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content
+      pullingText="下に引っ張って更新"
+      refreshingText="更新中...">
+    </ion-refresher-content>
+  </ion-refresher>
+
   <ion-card *ngFor="let article of articles | async" (click)="openUrl(article.url);">
     <img src={{article.imgUrl}}/>
     <ion-card-content>
