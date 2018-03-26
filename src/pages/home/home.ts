@@ -3,19 +3,25 @@ import { NavController, Platform } from 'ionic-angular';
 import { InAppBrowser } from '@ionic-native/in-app-browser';
 import { SafariViewController } from '@ionic-native/safari-view-controller';
 import { AngularFirestore } from 'angularfire2/firestore';
-import { Observable } from 'rxjs/Observable';
+import { Query } from '@firebase/firestore-types'
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import * as _ from 'lodash';
 
 @Component({
   selector: 'page-home',
   templateUrl: 'home.html'
 })
 export class HomePage {
-  articles: Observable<any[]>;
+  articles: BehaviorSubject<any[]> = new BehaviorSubject([]);
+  currentCursor: any;
 
   constructor(public navCtrl: NavController, public platform: Platform,
     private iab: InAppBrowser, private safariViewController: SafariViewController,
-    db: AngularFirestore) {
-    this.articles = db.collection('latestArticles').valueChanges();
+    private db: AngularFirestore) {
+  }
+
+  ionViewWillEnter() {
+    this.fetchArticles();
   }
 
   openUrl(url: string) {
@@ -51,4 +57,45 @@ export class HomePage {
     });
   }
 
+  doInfinite(infiniteScroll) {
+    const cursor = this.getCursor();
+
+    // Fetch articles if cursor was updated
+    if (this.currentCursor !== cursor) {
+      this.currentCursor = cursor;
+      this.fetchArticles(cursor);
+    }
+
+    infiniteScroll.complete();
+  }
+
+  private fetchArticles(cursor?) {
+    this.db.collection('latestArticles', ref => {
+      let query: Query = ref;
+
+      query = query
+        .orderBy('publishedDate', 'desc')
+        .limit(10);
+
+      if (cursor) {
+        query = query.startAfter(cursor);
+      }
+
+      return query;
+    })
+    .valueChanges()
+    .subscribe(articles => {
+      const current = this.articles.getValue();
+      this.articles.next(_.concat(current, articles));
+    });
+  }
+
+  // Determines the specified field's value of the last doc to paginate query
+  private getCursor() {
+    const current = this.articles.getValue();
+    if (current.length) {
+      return current[current.length - 1].publishedDate;
+    }
+    return null;
+  }
 }
