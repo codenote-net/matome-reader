@@ -12,13 +12,12 @@ import * as _ from 'lodash';
   templateUrl: 'home.html'
 })
 export class HomePage {
-  articles: BehaviorSubject<any[]>;
+  articles: BehaviorSubject<any[]> = new BehaviorSubject([]);
   currentCursor: any;
 
   constructor(public navCtrl: NavController, public platform: Platform,
     private iab: InAppBrowser, private safariViewController: SafariViewController,
     private db: AngularFirestore) {
-    this.articles = new BehaviorSubject([]);
   }
 
   ionViewWillEnter() {
